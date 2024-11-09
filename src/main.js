@@ -1,5 +1,4 @@
-import { createGameScene } from './game/game_entry.js';
+import { createGameScene } from './game/gameEntry.js';
 
 const container = document.body;
-// console.log(container);
 createGameScene(container);
