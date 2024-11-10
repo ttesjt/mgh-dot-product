@@ -70,7 +70,7 @@ export function createGameScene(container) {
   // =======================================================================================================
 
   setupMouseDrag(document, (dragDistance) => {
-    movableSun.sun.moveHorizontally(dragDistance);
+    movableSun.sun.rotateAroundCenter(dragDistance);
   });
 
   function animate() {
