@@ -1,4 +1,6 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import * as THREE from 'three';
 
 export async function createNormalArrows(scene, options = {}, lightSource) {
@@ -8,6 +10,7 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
   const fbx = await new Promise((resolve, reject) => {
     loader.load('/src/assets/models/normal.fbx', resolve, undefined, reject);
   });
+
   fbx.scale.set(scale, scale, scale);
   fbx.position.set(position.x, position.y, position.z);
   const groundNormalMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
@@ -16,21 +19,14 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
       child.material = groundNormalMaterial;
     }
   });
-
-  // Make the ground normal pointer look upward along the Y-axis
-  const pointerUpPosition = new THREE.Vector3(
-    fbx.position.x,
-    fbx.position.y + 1,
-    fbx.position.z
-  );
+  const pointerUpPosition = new THREE.Vector3(fbx.position.x, fbx.position.y + 1, fbx.position.z);
   fbx.lookAt(pointerUpPosition);
   scene.add(fbx);
-
-
 
   const lightSourcePointer = await new Promise((resolve, reject) => {
     loader.load('/src/assets/models/lightPointer.fbx', resolve, undefined, reject);
   });
+
   lightSourcePointer.scale.set(scale, scale, scale);
   lightSourcePointer.position.set(position.x, position.y, position.z);
   const lightSourceMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff });
@@ -41,16 +37,38 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
   });
   scene.add(lightSourcePointer);
 
+  const fontLoader = new FontLoader();
+  const font = await new Promise((resolve, reject) => {
+    fontLoader.load('/src/assets/fonts/helvetiker_regular.typeface.json', resolve, undefined, reject);
+  });
+
+  const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const dotProductTextGeometry = new TextGeometry("Light dot Normal = 0", {
+    font: font,
+    size: 0.2,
+    height: 0.0001,
+  });
+  const dotProductText = new THREE.Mesh(dotProductTextGeometry, textMaterial);
+  dotProductText.position.set(position.x + 1, position.y + 4, position.z);
+  scene.add(dotProductText);
+
+  function updateDotProductText(dotProduct) {
+    const text = `Light dot Normal = ${dotProduct.toFixed(2)}`;
+    dotProductText.geometry.dispose();
+    dotProductText.geometry = new TextGeometry(text, {
+      font: font,
+      size: 0.2,
+      height: 0.0001,
+    });
+  }
+
   const directionVector = new THREE.Vector3();
   lightSourcePointer.update = () => {
-    // Calculate the direction from the light source pointer to the light source
     directionVector.subVectors(lightSource.position, lightSourcePointer.position).normalize();
     lightSourcePointer.lookAt(lightSource.position);
-    // console.log('Euler angles:', {
-    //   x: lightSourcePointer.rotation.x,
-    //   y: lightSourcePointer.rotation.y,
-    //   z: lightSourcePointer.rotation.z,
-    // });
+
+    const dotProduct = directionVector.dot(new THREE.Vector3(0, 1, 0));
+    updateDotProductText(dotProduct);
   };
   lightSourcePointer.update();
 
