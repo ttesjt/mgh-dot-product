@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 
 /**
- * Creates a movable object (sun) that can be moved horizontally based on drag distance.
- * A directional light is attached to the sun and points towards a specified target.
+ * Creates a movable object (sun) that can be moved circularly around the lightTarget, basing on drag distance.
+ * This will also create the main directional lightsource in the scene!
  *
  * @param {THREE.Object3D} lightTarget - The target object that the light will always point towards.
  * @returns {Object} An object containing the sun mesh and directional light.
