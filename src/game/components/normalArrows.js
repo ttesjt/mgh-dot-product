@@ -3,12 +3,14 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js';
 import * as THREE from 'three';
 
+
+
 export async function createNormalArrows(scene, options = {}, lightSource) {
   const loader = new FBXLoader();
   const { scale = 0.1, position = { x: 0, y: 0, z: -5 } } = options;
 
   const fbx = await new Promise((resolve, reject) => {
-    loader.load('/src/assets/models/normal.fbx', resolve, undefined, reject);
+    loader.load('./models/normal.fbx', resolve, undefined, reject);
   });
 
   fbx.scale.set(scale, scale, scale);
@@ -24,7 +26,7 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
   scene.add(fbx);
 
   const lightSourcePointer = await new Promise((resolve, reject) => {
-    loader.load('/src/assets/models/lightPointer.fbx', resolve, undefined, reject);
+    loader.load('./models/lightPointer.fbx', resolve, undefined, reject);
   });
 
   lightSourcePointer.scale.set(scale, scale, scale);
@@ -39,14 +41,14 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
 
   const fontLoader = new FontLoader();
   const font = await new Promise((resolve, reject) => {
-    fontLoader.load('/src/assets/fonts/helvetiker_regular.typeface.json', resolve, undefined, reject);
+    fontLoader.load('./fonts/helvetiker_regular.typeface.json', resolve, undefined, reject);
   });
 
   const textMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const dotProductTextGeometry = new TextGeometry("Light dot Normal = 0", {
     font: font,
     size: 0.2,
-    height: 0.0001,
+    depth: 0.0001,
   });
   const dotProductText = new THREE.Mesh(dotProductTextGeometry, textMaterial);
   dotProductText.position.set(position.x + 1, position.y + 4, position.z);
@@ -58,7 +60,7 @@ export async function createNormalArrows(scene, options = {}, lightSource) {
     dotProductText.geometry = new TextGeometry(text, {
       font: font,
       size: 0.2,
-      height: 0.0001,
+      depth: 0.0001,
     });
   }
 
