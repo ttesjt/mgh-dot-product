@@ -1,6 +1,20 @@
 import * as THREE from 'three';
 import { setupMouseDrag } from './utils/mouseDrag.js';
 import { createMovableObjectSun } from './components/movableObjectSun.js';
+import { createNormalArrows } from './components/normalArrows.js';
+
+/*
+TODOs:
+1: Add a global z value for standard object depth.
+2: Add a shader that will show the dot product of the two vectors.
+3: Make the sun movement a rotation instead of a translation.
+4: Skybox. Something suitable. Maybe a solar system.
+5: Add texts.
+
+Juicy stuff:
+1: Add a post processing effect for light.
+2: Make normal arrows prettier.
+*/
 
 /**
  * Initializes and renders a Three.js game scene within a specified container.
@@ -27,26 +41,32 @@ export function createGameScene(container) {
   // =======================================================================================================
   const ambientLight = new THREE.AmbientLight(0x777777, 1);
   scene.add(ambientLight);
-  // later the directional light should move with a slider.
-  // const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-  // directionalLight.position.set(5, 7, 6);
-  // scene.add(directionalLight);
-  // const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-  // pointLight.position.set(0, 0, 0);
-  // scene.add(pointLight);
   // =======================================================================================================
 
   // ADDING OBJECTS
   // =======================================================================================================
   const geometry = new THREE.BoxGeometry();
   const material = new THREE.MeshStandardMaterial({ color: 0x0077ff });
-  const cube = new THREE.Mesh(geometry, material);
-  cube.position.set(-2, -2, -5);
-  scene.add(cube);
+  const ground = new THREE.Mesh(geometry, material);
+  ground.position.set(0, -2, -5);
+  ground.scale.set(4, 0.2, 4);
+  scene.add(ground);
 
-  const movableSun = createMovableObjectSun(cube);
+  const movableSun = createMovableObjectSun(ground);
   scene.add(movableSun.sun);
   scene.add(movableSun.directionalLight);
+
+
+
+  let normalArrows = null;
+  createNormalArrows(scene, {
+    scale: 0.001,
+    position: { x: 0, y: -1.8, z: -5 },
+  }, movableSun.sun).then((results) => {
+    normalArrows = results;
+  }).catch((error) => {
+    console.error('Error loading normal arrows:', error);
+  });
   // =======================================================================================================
 
   setupMouseDrag(document, (dragDistance) => {
@@ -55,6 +75,10 @@ export function createGameScene(container) {
 
   function animate() {
     requestAnimationFrame(animate);
+    if (normalArrows) {
+      // this might not be ready immediately
+      normalArrows.lightSourcePointer.update();
+    }
     renderer.render(scene, camera);
   }
   animate();

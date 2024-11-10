@@ -11,7 +11,7 @@ export function createMovableObjectSun(lightTarget) {
   const geometry = new THREE.SphereGeometry(0.5, 16, 16);
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffff00 });
   const sun = new THREE.Mesh(geometry, material);
-  sun.position.set(0, 1, -5);
+  sun.position.set(0, 1.5, -5);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
   directionalLight.position.copy(sun.position); // Start at the sun's position
